@@ -20,7 +20,7 @@ nHeads = [1, 2, 4]
 nLayers= [1, 2, 3]
 d_kList = [32, 64]
 
-batch_size = 1024
+batch_size_mini = 256
 epochs = 50
 threshold = 0.5
 
@@ -41,8 +41,8 @@ for nHeads, nLayers, d_k in product(nHeads, nLayers, d_kList):
 
         print('=====Fold-{}====='.format(fold))
         print('-----Generate data loader-----')
-        train_data, train_pep_inputs, train_hla_inputs, train_labels, train_loader = data_with_loader(type_ = 'train', fold = fold,  batch_size = batch_size)
-        val_data, val_pep_inputs, val_hla_inputs, val_labels, val_loader = data_with_loader(type_ = 'val', fold = fold,  batch_size = batch_size)
+        train_data, train_pep_inputs, train_hla_inputs, train_labels, train_loader = data_with_loader(type_ = 'train', fold = fold,  batch_size = batch_size_mini)
+        val_data, val_pep_inputs, val_hla_inputs, val_labels, val_loader = data_with_loader(type_ = 'val', fold = fold,  batch_size = batch_size_mini)
 
         print('Fold-{} Label info: Train = {} | Val = {}'.format(fold, Counter(train_data.label), Counter(val_data.label)))
 
