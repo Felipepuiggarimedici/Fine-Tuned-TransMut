@@ -13,14 +13,14 @@ vocab_size = len(vocab)
 # Transformer Parameters
 d_model = 64  # Embedding Size
 d_ff = 512 # FeedForward dimension
-patienceMini = 5 #patience for k-fold validation
+patienceMini = 3 #patience for k-fold validation
 patienceFull = 10 #patience for whole model training
 
 nHeads = [1, 2, 4]
 nLayers= [1, 2, 3]
 d_kList = [32, 64]
 
-batch_size_mini = 256
+batch_size_mini = 2048
 epochs = 50
 threshold = 0.5
 
@@ -40,6 +40,7 @@ for nHeads, nLayers, d_k in product(nHeads, nLayers, d_kList):
         loss_train_fold_dict, loss_val_fold_dict, loss_independent_fold_dict, loss_external_fold_dict = {}, {}, {}, {}
 
         print('=====Fold-{}====='.format(fold))
+        print('=====Number of Heads: {}, Number of Layers ={}, d_k=d_v: {}====='.format(nHeads, nLayers, d_k))
         print('-----Generate data loader-----')
         train_data, train_pep_inputs, train_hla_inputs, train_labels, train_loader = data_with_loader(type_ = 'train', fold = fold,  batch_size = batch_size_mini)
         val_data, val_pep_inputs, val_hla_inputs, val_labels, val_loader = data_with_loader(type_ = 'val', fold = fold,  batch_size = batch_size_mini)
@@ -81,6 +82,7 @@ for nHeads, nLayers, d_k in product(nHeads, nLayers, d_kList):
 
         print('-----Optimization Finished!-----')
         print("Total training time: {:6.2f} sec".format(time_train))
+        print('Parameters tested: n_heads: {}, n_layers: {}, d_k {}, fold: {}'.format(nHeads, nLayers, d_k, fold))
     metrics_all = np.array(metrics_all)
     metrics_mean = metrics_all.mean(axis=0)
     results.append({
