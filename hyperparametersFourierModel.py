@@ -48,7 +48,7 @@ for nHeads, nLayers, d_k in product(nHeads, nLayers, d_kList):
         print('Fold-{} Label info: Train = {} | Val = {}'.format(fold, Counter(train_data.label), Counter(val_data.label)))
 
         print('-----Compile model-----')
-        model = Transformer(d_model, d_k, nLayers, nHeads, d_ff).to(device)
+        model = FourierTransformer(d_model, d_k, nLayers, nHeads, d_ff).to(device)
         criterion = nn.CrossEntropyLoss()
         optimizer = optim.Adam(model.parameters(), lr = 1e-3)#, momentum = 0.99)
 
@@ -101,6 +101,6 @@ for nHeads, nLayers, d_k in product(nHeads, nLayers, d_kList):
     }) 
 
 df = pd.DataFrame(results)
-df.to_csv('hyperparametersMainModel.csv', index=False)
-print("Saved results in hyperparametersMainModel.csv")
+df.to_csv('hyperparametersFourierModel.csv', index=False)
+print("Saved results in hyperparametersFourierModel.csv")
 
