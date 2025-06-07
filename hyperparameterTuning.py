@@ -16,8 +16,8 @@ d_ff = 512 # FeedForward dimension
 patienceMini = 3 #patience for k-fold validation
 patienceFull = 10 #patience for whole model training
 
-nHeads = [1, 2, 4]
-nLayers= [1, 2, 3]
+nHeads = [1, 2, 4,6, 8]
+nLayers= [1, 2, 3, 4, 5, 6]
 d_kList = [32, 64]
 
 batch_size_mini = 2048

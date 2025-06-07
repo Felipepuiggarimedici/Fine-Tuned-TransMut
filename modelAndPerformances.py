@@ -349,33 +349,6 @@ class Transformer(nn.Module):
 
         return dec_logits.view(-1, dec_logits.size(-1)), pep_enc_self_attns, hla_enc_self_attns, dec_self_attns
 
-    def forward(self, pep_inputs, hla_inputs):
-        '''
-        pep_inputs: [batch_size, pep_len]
-        hla_inputs: [batch_size, hla_len]
-        '''
-        # tensor to store decoder outputs
-        # outputs = torch.zeros(batch_size, tgt_len, tgt_vocab_size).to(self.device)
-        
-        # enc_outputs: [batch_size, src_len, d_model], enc_self_attns: [n_layers, batch_size, n_heads, src_len, src_len]
-        pep_enc_outputs, pep_enc_self_attns = self.pep_encoder(pep_inputs)
-        hla_enc_outputs, hla_enc_self_attns = self.hla_encoder(hla_inputs)
-        #FourierPart
-        pep_enc_outputs = self.pep_encoder_fourier(pep_enc_outputs)
-        hla_enc_outputs = self.pep_encoder_fourier(hla_enc_outputs)
-        #encoder second part
-        pep_enc_outputs, pep_enc_self_attns = self.pep_encoder2(pep_inputs)
-        hla_enc_outputs, hla_enc_self_attns = self.hla_encoder2(hla_inputs)
-        enc_outputs = torch.cat((pep_enc_outputs, hla_enc_outputs), 1) # concat pep & hla embedding
-        #Fourier Part on concatenated
-        fourierOutput = self.concatenatedFourier(enc_outputs)
-        # dec_outpus: [batch_size, tgt_len, d_model], dec_self_attns: [n_layers, batch_size, n_heads, tgt_len, tgt_len], dec_enc_attn: [n_layers, batch_size, tgt_len, src_len]
-        dec_outputs, dec_self_attns = self.decoder(fourierOutput)
-        dec_outputs = dec_outputs.view(dec_outputs.shape[0], -1) # Flatten [batch_size, tgt_len * d_model]
-        dec_logits = self.projection(dec_outputs) # dec_logits: [batch_size, tgt_len, tgt_vocab_size]
-
-        return dec_logits.view(-1, dec_logits.size(-1)), pep_enc_self_attns, hla_enc_self_attns, dec_self_attns
-
 def performances(y_true, y_pred, y_prob, print_ = True):
     
     tn, fp, fn, tp = confusion_matrix(y_true, y_pred, labels = [0, 1]).ravel().tolist()
