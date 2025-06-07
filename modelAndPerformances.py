@@ -309,32 +309,6 @@ class Decoder(nn.Module):
             
         return dec_outputs, dec_self_attns
 
-class AlteredFourierLayer(nn.Module):
-    def __init__(self, d_model):
-        super(AlteredFourierLayer, self).__init__()
-        self.restoreDim = nn.Linear(d_model//2 + 1, d_model, bias = False)
-    def forward(self, x):
-        x_fft = torch.fft.rfft2(x, dim=(-2, -1)) #FFT over the last two dimensions
-        x_fft = x_fft.real  #Take only the real part as in the paper
-        x_fft = self.restoreDim(x_fft)
-        return x_fft
-    
-class FourierEncoder(nn.Module):
-    def __init__(self, d_model):
-        super(FourierEncoder, self).__init__()
-        self.d_model = d_model
-        self.dense = nn.Linear(d_model, d_model, bias = False)
-        self.fourier = AlteredFourierLayer(d_model)
-        self.norm1 = nn.LayerNorm(d_model)
-        self.norm2 = nn.LayerNorm(d_model)
-    def forward(self, x):
-        residual1 = x
-        fft = self.fourier(x)
-        x = self.norm1(fft + residual1)
-        residual2 = x
-        x = self.dense(x)
-        return self.norm2(x + residual2) 
-
 
 class Transformer(nn.Module):
     def __init__(self, d_model, d_k, n_layers, n_heads, d_ff, tgt_len = tgt_len):
@@ -374,30 +348,6 @@ class Transformer(nn.Module):
         dec_logits = self.projection(dec_outputs) # dec_logits: [batch_size, tgt_len, tgt_vocab_size]
 
         return dec_logits.view(-1, dec_logits.size(-1)), pep_enc_self_attns, hla_enc_self_attns, dec_self_attns
-
-class FourierTransformer(nn.Module):
-    def __init__(self, d_model, d_k, n_layers, n_heads, d_ff, tgt_len = tgt_len):
-        super(FourierTransformer, self).__init__()
-        self.pep_encoder = Encoder(d_model, n_layers, d_k, n_heads, d_ff)
-        self.hla_encoder = Encoder(d_model, n_layers, d_k, n_heads, d_ff)
-        self.pep_encoder2 = Encoder(d_model, n_layers, d_k, n_heads, d_ff)
-        self.hla_encoder2 = Encoder(d_model, n_layers, d_k, n_heads, d_ff)
-        self.decoder = Decoder(d_model, n_layers, d_k, n_heads, d_ff, tgt_len)
-        self.tgt_len = tgt_len
-        self.pep_encoder_fourier = FourierEncoder(d_model)
-        self.hla_encoder_fourier = FourierEncoder(d_model)
-        self.concatenatedFourier = FourierEncoder(d_model)
-        self.projection = nn.Sequential(
-                                        nn.Linear(tgt_len * d_model, 256),
-                                        nn.ReLU(True),
-
-                                        nn.BatchNorm1d(256),
-                                        nn.Linear(256, 64),
-                                        nn.ReLU(True),
-
-                                        #output layer
-                                        nn.Linear(64, 2)
-                                        )
 
     def forward(self, pep_inputs, hla_inputs):
         '''
