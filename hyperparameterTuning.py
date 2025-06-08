@@ -16,8 +16,8 @@ d_ff = 512 # FeedForward dimension
 patienceMini = 3 #patience for k-fold validation
 patienceFull = 10 #patience for whole model training
 
-nHeads = [1, 2, 4,6, 8]
-nLayers= [1, 2, 3, 4, 5, 6]
+nHeads = [1, 2, 4,6]
+nLayers= [1, 2, 3, 4]
 d_kList = [32, 64]
 
 batch_size_mini = 2048
@@ -89,7 +89,7 @@ for nHeads, nLayers, d_k in product(nHeads, nLayers, d_kList):
         'n_heads': nHeads,
         'n_layers': nLayers,
         'd_k': d_k,
-        'roc_auc': metrics_mean[0],
+        'roc_auc': metrics_mean[8],
         'accuracy': metrics_mean[1],
         'mcc': metrics_mean[2],
         'f1': metrics_mean[3],
@@ -97,7 +97,7 @@ for nHeads, nLayers, d_k in product(nHeads, nLayers, d_kList):
         "specificity": metrics_mean[5],
         "precision":  metrics_mean[6],
         "recall":  metrics_mean[7],
-        "aupr":  metrics_mean[8]
+        "aupr":  metrics_mean[0]
     }) 
 
 df = pd.DataFrame(results)

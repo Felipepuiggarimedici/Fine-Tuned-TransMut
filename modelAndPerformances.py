@@ -389,7 +389,7 @@ def performances(y_true, y_pred, y_prob, print_ = True):
         print('auc={:.4f}|sensitivity={:.4f}|specificity={:.4f}|acc={:.4f}|mcc={:.4f}'.format(roc_auc, sensitivity, specificity, accuracy, mcc))
         print('precision={:.4f}|recall={:.4f}|f1={:.4f}|aupr={:.4f}'.format(precision, recall, f1, aupr))
     
-    return (roc_auc, accuracy, mcc, f1, sensitivity, specificity, precision, recall, aupr)
+    return (aupr, accuracy, mcc, f1, sensitivity, specificity, precision, recall, roc_auc)
 
 
 # In[25]:
