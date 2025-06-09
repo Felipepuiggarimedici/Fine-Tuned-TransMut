@@ -12,13 +12,13 @@ vocab_size = len(vocab)
 
 # Transformer Parameters
 d_model = 64  # Embedding Size
-d_ff = 512 # FeedForward dimension
 patienceMini = 3 #patience for k-fold validation
 patienceFull = 10 #patience for whole model training
 
-nHeads = [1, 2, 4,6]
-nLayers= [1, 2, 3, 4]
+nHeads = [1, 2, 4,6, 8, 10]
+nLayers= [1, 2, 3, 4, 5, 6]
 d_kList = [32, 64]
+d_ffList = [128, 256, 512, 1024]
 
 batch_size_mini = 2048
 epochs = 50
@@ -30,7 +30,7 @@ use_cuda = torch.cuda.is_available()
 device = torch.device("cuda" if use_cuda else "cpu")
 results = []
 
-for nHeads, nLayers, d_k in product(nHeads, nLayers, d_kList):
+for nHeads, nLayers, d_k, d_ff in product(nHeads, nLayers, d_kList, d_ffList):
     metrics_all = []
     for fold in range(folds):
         ys_train_fold_dict, ys_val_fold_dict = {}, {}
@@ -40,7 +40,7 @@ for nHeads, nLayers, d_k in product(nHeads, nLayers, d_kList):
         loss_train_fold_dict, loss_val_fold_dict, loss_independent_fold_dict, loss_external_fold_dict = {}, {}, {}, {}
 
         print('=====Fold-{}====='.format(fold))
-        print('=====Number of Heads: {}, Number of Layers ={}, d_k=d_v: {}====='.format(nHeads, nLayers, d_k))
+        print('=====Number of Heads: {}, Number of Layers ={}, d_k=d_v: {}, d_ff = {} ====='.format(nHeads, nLayers, d_k, d_ff))
         print('-----Generate data loader-----')
         train_data, train_pep_inputs, train_hla_inputs, train_labels, train_loader = data_with_loader(type_ = 'train', fold = fold,  batch_size = batch_size_mini)
         val_data, val_pep_inputs, val_hla_inputs, val_labels, val_loader = data_with_loader(type_ = 'val', fold = fold,  batch_size = batch_size_mini)
@@ -89,6 +89,7 @@ for nHeads, nLayers, d_k in product(nHeads, nLayers, d_kList):
         'n_heads': nHeads,
         'n_layers': nLayers,
         'd_k': d_k,
+        "d_ff": d_ff,
         'roc_auc': metrics_mean[8],
         'accuracy': metrics_mean[1],
         'mcc': metrics_mean[2],

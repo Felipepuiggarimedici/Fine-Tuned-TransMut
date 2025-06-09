@@ -76,16 +76,21 @@ def data_with_loader(type_='train', fold=0, batch_size=1024):
 
     return data, pep_inputs, hla_inputs, labels, loader
 
-def make_data(data):
-    pep_inputs, hla_inputs, labels = [], [], []
-    for pep, hla, label in zip(data.peptide, data.HLA_sequence, data.label):
+def make_data(data, HLAFlag = False):
+    'If flag is set to True the hlaLabels will be returned as well'
+    pep_inputs, hla_inputs, labels, hlaLabels = [], [], [], []
+    for pep, hla, label, hlaLabel in zip(data.peptide, data.HLA_sequence, data.label, data.HLA):
         pep, hla = pep.ljust(pep_max_len, '-'), hla.ljust(hla_max_len, '-')
         pep_input = [[vocab[n] for n in pep]] # [[1, 2, 3, 4, 0], [1, 2, 3, 5, 0]]
         hla_input = [[vocab[n] for n in hla]]
         pep_inputs.extend(pep_input)
         hla_inputs.extend(hla_input)
         labels.append(label)
-    return torch.LongTensor(pep_inputs), torch.LongTensor(hla_inputs), torch.LongTensor(labels)
+        hlaLabels.append(hlaLabel)
+    if HLAFlag:
+        return torch.LongTensor(pep_inputs), torch.LongTensor(hla_inputs), torch.LongTensor(labels),  np.array(hlaLabels)
+    else:
+        return torch.LongTensor(pep_inputs), torch.LongTensor(hla_inputs), torch.LongTensor(labels)
 
 class MyDataSet(Data.Dataset):
     def __init__(self, pep_inputs, hla_inputs, labels):
@@ -464,7 +469,7 @@ def train_step(model, train_loader, fold, epoch, epochs, criterion, optimizer, t
     
     return ys_train, loss_train_list, metrics_train, time_train_ep#, dec_attns_train_list
 
-def eval_step(model, val_loader, epoch, epochs, criterion, threshold = 0.5, use_cuda = True):
+def eval_step(model, val_loader, criterion, threshold = 0.5, use_cuda = True):
     device = torch.device("cuda" if use_cuda else "cpu")
     
     model.eval()
@@ -489,7 +494,6 @@ def eval_step(model, val_loader, epoch, epochs, criterion, threshold = 0.5, use_
         y_pred_val_list = transfer(y_prob_val_list, threshold)
         ys_val = (y_true_val_list, y_pred_val_list, y_prob_val_list)
         
-        print('****Test  Epoch-{}/{}: Loss = {:.6f}'.format(epoch, epochs, f_mean(loss_val_list)))
         metrics_val = performances(y_true_val_list, y_pred_val_list, y_prob_val_list, print_ = True)
     return ys_val, loss_val_list, metrics_val#, dec_attns_val_list
 
