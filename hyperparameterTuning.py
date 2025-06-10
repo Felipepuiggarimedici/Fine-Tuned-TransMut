@@ -15,10 +15,10 @@ d_model = 64  # Embedding Size
 patienceMini = 3 #patience for k-fold validation
 patienceFull = 10 #patience for whole model training
 
-nHeads = [1, 2, 4,6, 8, 10]
-nLayers= [1, 2, 3, 4, 5, 6]
+nHeads = [4,6, 8, 10]
+nLayers= [3, 4, 5, 6]
 d_kList = [32, 64]
-d_ffList = [128, 256, 512, 1024]
+d_ffList = [256, 512, 1024]
 
 batch_size_mini = 2048
 epochs = 50

@@ -1,3 +1,4 @@
 data/trainDataFull/train_data.csv filter=lfs diff=lfs merge=lfs -text
+data filter=lfs diff=lfs merge=lfs -text
 data/trainDataFull/fullTrainingData.csv filter=lfs diff=lfs merge=lfs -text
 *.csv filter=lfs diff=lfs merge=lfs -text
