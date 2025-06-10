@@ -4,3 +4,4 @@ data/trainDataFull/fullTrainingData filter=lfs diff=lfs merge=lfs -text
 data/trainDataFull/fullTrainingData.csv filter=lfs diff=lfs merge=lfs -text
 *.gif filter=lfs diff=lfs merge=lfs -text
 *.csv filter=lfs diff=lfs merge=lfs -text
+data/* filter=lfs diff=lfs merge=lfs -text
